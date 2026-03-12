@@ -1,10 +1,15 @@
 import streamlit as st
-import pandas as pd
 import numpy as np
 import pickle
+import os
 
 st.set_page_config(page_title='House Price Prediction', layout='centered')
 st.title('House Price Prediction')
+
+# Check if model files exist
+if not os.path.exists('rf_model.pkl') or not os.path.exists('encoders.pkl'):
+    st.error('Model files not found! Please run train_and_save.py first.')
+    st.stop()
 
 @st.cache_resource
 def load_artifacts():
@@ -14,14 +19,18 @@ def load_artifacts():
         enc = pickle.load(f)
     return model, enc
 
-model, enc = load_artifacts()
-le_location = enc['le_location']
-le_transaction = enc['le_transaction']
-le_furnishing = enc['le_furnishing']
-le_status = enc['le_status']
-features = enc['features']
+try:
+    model, enc = load_artifacts()
+    le_location = enc['le_location']
+    le_transaction = enc['le_transaction']
+    le_furnishing = enc['le_furnishing']
+    le_status = enc['le_status']
+    features = enc['features']
+except Exception as e:
+    st.error(f'Error loading model: {e}')
+    st.stop()
 
-st.markdown('Enter the house details and click Predict')
+st.markdown('Enter house details and click Predict')
 
 col1, col2 = st.columns(2)
 with col1:
@@ -40,7 +49,7 @@ if st.button('Predict'):
         if val in list(le.classes_):
             return int(le.transform([val])[0])
         else:
-            return int(0)
+            return 0
 
     loc_enc = safe_transform(le_location, location)
     trans_enc = safe_transform(le_transaction, transaction)
@@ -52,7 +61,3 @@ if st.button('Predict'):
     pred_rupees = pred_lakhs * 100000
 
     st.success(f'Predicted price: ₹ {pred_rupees:,.0f} ({pred_lakhs:.2f} Lakhs)')
-    st.caption('Random Forest model')
-
-st.markdown('---')
-st.markdown('Run `python train_and_save.py` to retrain the model.')
