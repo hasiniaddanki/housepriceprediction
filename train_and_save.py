@@ -86,9 +86,8 @@ y = df['Price_in_Lakhs']
 
 # Train Random Forest
 print('Training Random Forest...')
-model = RandomForestRegressor(n_estimators=30, max_depth=12, random_state=42, n_jobs=-1)
+model = RandomForestRegressor(n_estimators=50, max_depth=15, random_state=42, n_jobs=-1)
 model.fit(X, y)
-print(f'Training R² score: {model.score(X, y):.4f}')
 
 # Save model and encoders
 print('Saving model and encoders...')
