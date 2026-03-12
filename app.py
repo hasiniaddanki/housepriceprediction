@@ -1,22 +1,20 @@
 import streamlit as st
 import numpy as np
-import pickle
+import joblib
 import os
 
 st.set_page_config(page_title='House Price Prediction', layout='centered')
 st.title('House Price Prediction')
 
 # Check if model files exist
-if not os.path.exists('rf_model.pkl') or not os.path.exists('encoders.pkl'):
+if not os.path.exists('rf_model.joblib') or not os.path.exists('encoders.joblib'):
     st.error('Model files not found! Please run train_and_save.py first.')
     st.stop()
 
 @st.cache_resource
 def load_artifacts():
-    with open('rf_model.pkl', 'rb') as f:
-        model = pickle.load(f)
-    with open('encoders.pkl', 'rb') as f:
-        enc = pickle.load(f)
+    model = joblib.load('rf_model.joblib')
+    enc = joblib.load('encoders.joblib')
     return model, enc
 
 try:
